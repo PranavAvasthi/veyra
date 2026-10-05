@@ -1,3 +1,6 @@
+const { Color } = require("./src/theme/color.ts");
+const { Spacing, BorderWidth } = require("./src/theme/spacing.ts");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -6,7 +9,11 @@ module.exports = {
   ],
   presets: [require("nativewind/preset")],
   theme: {
-    extend: {},
+    extend: {
+      colors: Color,
+      spacing: Spacing,
+      borderWidth: BorderWidth,
+    },
   },
   plugins: [],
 };
