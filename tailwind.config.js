@@ -11,6 +11,15 @@ module.exports = {
   theme: {
     extend: {
       colors: Color,
+      fontFamily: {
+        manropeExtraLight: "manropeExtraLight",
+        manropeLight: "manropeLight",
+        manropeNormal: "manropeNormal",
+        manropeMedium: "manropeMedium",
+        manropeSemiBold: "manropeSemiBold",
+        manropeBold: "manropeBold",
+        manropeExtraBold: "manropeExtraBold",
+      },
       spacing: Spacing,
       borderWidth: BorderWidth,
     },
