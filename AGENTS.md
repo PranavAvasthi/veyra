@@ -99,6 +99,22 @@ Segregation is the main key to readable code.
 - Icons: use `lucide-react-native` by default. Only create an SVG component in `components/icons/` when lucide has no match. Never inline raw SVG inside another component.
 - Prefer composition over boolean-prop explosions. Avoid prop drilling beyond two levels.
 
+## Typography
+
+Use the Manrope font-family classes already configured in `tailwind.config.js` and loaded in the root layout. Choose the matching font file for each weight instead of generic Tailwind font-weight utilities; do not combine them.
+
+| Instead of        | Use                      |
+| ----------------- | ------------------------ |
+| `font-extralight` | `font-manropeExtraLight` |
+| `font-light`      | `font-manropeLight`      |
+| `font-normal`     | `font-manropeNormal`     |
+| `font-medium`     | `font-manropeMedium`     |
+| `font-semibold`   | `font-manropeSemiBold`   |
+| `font-bold`       | `font-manropeBold`       |
+| `font-extrabold`  | `font-manropeExtraBold`  |
+
+Use `font-manropeNormal` for regular body text. Only use configured, loaded font families; do not invent classes for unsupported weights.
+
 ## Theming and color tokens (most important rule)
 
 All colors come from `src/theme/color.ts` (`LightPallete`, `DarkPallete`). The app uses NativeWind with a semantic token system, so one class name works in both light and dark mode with no `dark:` prefixes.
@@ -113,12 +129,12 @@ Always:
 
 ```tsx
 <View className="bg-background-50 border border-border-200 rounded-2xl p-4">
-  <Text className="text-text-900 text-lg font-semibold">{title}</Text>
-  <Text className="text-text-500">{subtitle}</Text>
+  <Text className="text-text-900 text-lg font-manropeSemiBold">{title}</Text>
+  <Text className="text-text-500 font-manropeNormal">{subtitle}</Text>
 </View>
 
 <Pressable className="bg-primary-500 active:bg-primary-600 rounded-xl px-5 py-3">
-  <Text className="text-text-0 font-medium">Continue</Text>
+  <Text className="text-text-0 font-manropeMedium">Continue</Text>
 </Pressable>
 
 <View className="bg-background-error border border-error-300 rounded-lg p-3" />
