@@ -48,6 +48,8 @@ src/
 
 Use the `@/` path alias (`@/components/ui/Button`). Avoid deep relative imports.
 
+Keep product documentation concise in `docs/PRD.md`, the single source of truth. Use its public prototype link for design references; do not store screenshots, source archives, or duplicate PRDs in the repo. Update the PRD when product decisions change.
+
 ## Data layer
 
 There is no backend. JSON files in `src/data/` stand in for API responses so a real backend can be swapped in later without touching UI code.
@@ -96,7 +98,7 @@ Segregation is the main key to readable code.
 - Primitives (`components/ui/`) are generic, have no business logic, no data fetching, and accept `className` plus a clear `variant` / `size` API. Build reusability here first; if a pattern appears twice, it becomes a primitive.
 - `components/common/` holds shared pieces that know about the app but not a specific section.
 - Section components go in `components/<section>/` and may use `ui/` and `common/`, never another section's internals.
-- Icons: use `lucide-react-native` by default. Only create an SVG component in `components/icons/` when lucide has no match. Never inline raw SVG inside another component.
+- Icons: use `lucide-react-native` by default. When an SVG asset is supplied or already available, use it even if lucide has a match. Create `src/components/icons/` when first needed, wrap it in a reusable PascalCase component such as `SearchIcon.tsx` exporting `SearchIcon`, and import that component wherever needed. Never inline raw SVG inside another component.
 - Prefer composition over boolean-prop explosions. Avoid prop drilling beyond two levels.
 
 ## Typography
