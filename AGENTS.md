@@ -24,6 +24,8 @@ npx expo install --fix      # fix incompatible package versions
 
 Run lint and typecheck before declaring any task done.
 
+`patches/expo-modules-jsi+57.1.1.patch` backports Expo PR #51040 for Xcode 26.3 (constructor ownership and Swift concurrency errors). `postinstall` applies it through `patch-package`; remove the patch once an SDK-compatible release includes the fix. Do not edit generated native projects to work around this dependency bug.
+
 ## Project structure
 
 All source lives in `src/`. Create a folder the first time it is needed; never dump files at the `src/` root.
