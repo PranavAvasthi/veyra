@@ -1,30 +1,22 @@
-import { useFonts } from "expo-font";
 import { Slot } from "expo-router";
-import { useEffect } from "react";
-import "../global.css";
+import * as SplashScreen from "expo-splash-screen";
+
+import { ThemeProvider } from "@/components/wrappers/ThemeProvider";
+import "@/global.css";
+import { useAppReady } from "@/hooks/useAppReady";
+
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    manropeExtraLight: require("../../assets/fonts/manrope-200.ttf"),
-    manropeLight: require("../../assets/fonts/manrope-300.ttf"),
-    manropeNormal: require("../../assets/fonts/manrope-400.ttf"),
-    manropeMedium: require("../../assets/fonts/manrope-500.ttf"),
-    manropeSemiBold: require("../../assets/fonts/manrope-600.ttf"),
-    manropeBold: require("../../assets/fonts/manrope-700.ttf"),
-    manropeExtraBold: require("../../assets/fonts/manrope-800.ttf"),
-  });
+  const { isReady, onLayout } = useAppReady();
 
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  if (!loaded) {
+  if (!isReady) {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <ThemeProvider onLayout={onLayout}>
+      <Slot />
+    </ThemeProvider>
+  );
 }
-
-const RootLayoutNav = () => {
-  return <Slot />;
-};

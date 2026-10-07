@@ -34,6 +34,7 @@ src/
 ├── components/
 │   ├── ui/                 # Primitives: Button, TextInput, Card, Badge, Chip, Avatar, Skeleton...
 │   ├── common/             # Shared, app-aware pieces: ScreenContainer, SectionHeader, EmptyState...
+│   ├── wrappers/           # Providers and wrappers: ThemeProvider...
 │   ├── icons/              # Custom SVG icons only. Prefer lucide-react-native for everything else.
 │   └── <section>/          # One folder per feature/section: home/, projects/, about/, contact/...
 ├── data/                   # JSON files acting as the backend (see Data layer)
@@ -49,6 +50,10 @@ src/
 Use the `@/` path alias (`@/components/ui/Button`). Avoid deep relative imports.
 
 Keep product documentation concise in `docs/PRD.md`, the single source of truth. Use its public prototype link for design references; do not store screenshots, source archives, or duplicate PRDs in the repo. Update the PRD when product decisions change.
+
+Startup assets and motion constants live in `src/constants/`; readiness logic lives in `src/hooks/useAppReady.ts`. `components/wrappers/ThemeProvider` applies palette-generated NativeWind variables and follows the active scheme. `app.config.ts` is the sole Expo configuration, including palette-based native splash colors; do not add `app.json`. Keep the native splash visible until fonts and the brand asset are ready; use the index splash as the current preview until onboarding exists.
+
+NativeWind uses `darkMode: "class"` for appearance overrides. Startup explicitly selects `system`; otherwise the web class strategy can initialize as light even on a dark device. Dynamic Expo config runs outside Metro: use typed relative `require` with explicit `.ts` paths for shared tokens under Node 24, not the `@/` app alias.
 
 ## Data layer
 
@@ -97,6 +102,7 @@ Segregation is the main key to readable code.
 - Screens in `src/app/` are thin: fetch via hooks, compose section components, nothing else.
 - Primitives (`components/ui/`) are generic, have no business logic, no data fetching, and accept `className` plus a clear `variant` / `size` API. Build reusability here first; if a pattern appears twice, it becomes a primitive.
 - `components/common/` holds shared pieces that know about the app but not a specific section.
+- `components/wrappers/` holds providers and wrappers such as `ThemeProvider`.
 - Section components go in `components/<section>/` and may use `ui/` and `common/`, never another section's internals.
 - Icons: use `lucide-react-native` by default. When an SVG asset is supplied or already available, use it even if lucide has a match. Create `src/components/icons/` when first needed, wrap it in a reusable PascalCase component such as `SearchIcon.tsx` exporting `SearchIcon`, and import that component wherever needed. Never inline raw SVG inside another component.
 - Prefer composition over boolean-prop explosions. Avoid prop drilling beyond two levels.
@@ -125,6 +131,7 @@ How it works:
 
 - Every palette group (`primary`, `secondary`, `tertiary`, `error`, `success`, `warning`, `info`, `text`, `border`, `background`) and its steps (`0`–`950`, plus `muted`, `success`, `warning`, `error`, `info` on `background`) is exposed as a Tailwind color in `tailwind.config.js`.
 - Each token resolves to a CSS variable. Variable values are generated from `LightPallete` and `DarkPallete` and switched by color scheme (NativeWind `vars()` at the root). The dark palette is already inverted per step, so `bg-background-50` is the base surface in both modes.
+- Color variables store palette hex values directly; Tailwind references `var(--color-<group>-<step>)`. Do not convert to RGB channels or add alpha-value wrappers; use palette tint tokens instead of color opacity modifiers.
 - Components only ever reference the token class. They never know which mode is active.
 
 Always:
@@ -163,7 +170,7 @@ export function NotificationButton() {
 }
 ```
 
-`useThemeColors` returns `LightPallete` or `DarkPallete` based on the active color scheme. `Color` exported from `color.ts` is the default (dark) appearance and should only be used for static fallbacks such as splash configuration.
+`useThemeColors` returns `LightPallete` or `DarkPallete` based on the active color scheme. `Color` exported from `color.ts` is the default (dark) palette. Use it for static fallbacks such as splash configuration and to enumerate shared token names in Tailwind; runtime colors still come from the active palette.
 
 Token guidance:
 
@@ -194,7 +201,7 @@ Token guidance:
 - Platform differences: `Platform.select` or `.ios.tsx` / `.android.tsx` files, never scattered `Platform.OS` checks inside JSX.
 - Fonts and assets: load with `expo-font` / `expo-asset` and keep the splash screen visible until ready.
 - Haptics (`expo-haptics`) on meaningful interactions only.
-- Secrets and config via `app.json` / `app.config.ts` and EAS env, never hardcoded.
+- Secrets and config via `app.config.ts` and EAS env, never hardcoded.
 - Keep the JS bundle lean: audit dependencies before adding, prefer Expo modules.
 
 ## Design and motion
@@ -221,7 +228,7 @@ Docs: https://docs.expo.dev/eas/index.md
 
 ## Rules
 
-- If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
+- If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.config.ts` and config plugins.
 - Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
 
